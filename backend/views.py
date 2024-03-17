@@ -241,7 +241,7 @@ class ProductInfoView(APIView):
             200: {'example': {
                 "id": 4216292,
                 "model": "apple/iphone/xs-max",
-                "product": "Петров",
+                "product": "phone",
                 "shop": "petrov-s@gmail.com",
                 "quantity": 14,
                 "price": 110000,
