@@ -20,13 +20,22 @@ from backend.models import Shop, Category, ProductInfo, Order, OrderItem, Contac
 from backend.serializers import UserSerializer, CategorySerializer, ShopSerializer, ProductInfoSerializer, \
     OrderItemSerializer, OrderSerializer, ContactSerializer
 from backend.signals import new_order
-from .tasks import get_import, send_email
+
+from drf_spectacular.utils import extend_schema, OpenApiExample, OpenApiParameter
 
 
 class RegisterAccount(APIView):
     """
     Для регистрации покупателей
     """
+    @extend_schema(
+        request=UserSerializer,
+        responses={
+            201: {'example': {'Status': True, 'Comment': 'Пользователь зарегистрирован'}},
+            400: {'example': {'Status': False, 'Error': 'Не указаны все необходимые аргументы'}},
+            403: {'example': {'Status': False, 'Error': 'Отказано в доступе'}}
+        }
+    )
     # Регистрация методом POST
     def post(self, request, *args, **kwargs):
 
@@ -68,6 +77,15 @@ class ConfirmAccount(APIView):
     """
 
     throttle_classes = (AnonRateThrottle,)
+    
+    @extend_schema(
+        request=UserSerializer
+        responses={
+            200: {'example': {'Status': True, 'Comment': 'Токен правильный'}},
+            401: {'example': {'Status': False, 'Errors': 'Неправильно указан токен или email'}},
+            400: {'example': {'Status': False, 'Error': 'Не указаны все необходимые аргументы'}}
+        }
+    )
 
     # Регистрация методом POST
     def post(self, request, *args, **kwargs):
@@ -94,6 +112,22 @@ class AccountDetails(APIView):
     """
 
     throttle_classes = (UserRateThrottle,)
+    
+    @extend_schema(
+        responses={
+            200: {'example': {
+                "id": 1,
+                "first_name": "Сергей",
+                "last_name": "Петров",
+                "email": "petrov-s@gmail.com",
+                "company": "АО РДУ",
+                "position": "инженер КИП",
+                "contacts": "+79998887777"       
+            }
+            },
+            403: {'example': {'Status': False, 'Comment': 'Error', 'Error': 'Требуется вход в систему'}},
+        }
+    )
 
     # получить данные
     def get(self, request, *args, **kwargs):
@@ -103,6 +137,15 @@ class AccountDetails(APIView):
         serializer = UserSerializer(request.user)
         return Response(serializer.data)
 
+
+    @extend_schema(
+        request=UserSerializer,
+        responses={
+            201: {'example': {'Status': True, 'Comment': 'Пользователь обновлен'}},
+            400: {'example': {'Status': False, 'Error': 'Недостаточно сложный пароль'}},
+            403: {'example': {'Status': False, 'Error': 'Требуется вход в систему'}}
+        }
+    )
     # Редактирование методом POST
     def post(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
@@ -141,6 +184,15 @@ class LoginAccount(APIView):
     """
 
     throttle_classes = (AnonRateThrottle,)
+    
+    @extend_schema(
+        request=UserSerializer,
+        responses={
+            201: {'example': {'Status': True, 'Comment': 'Вы вошли в систему'}},
+            400: {'example': {'Status': False, 'Error': 'Не указаны все необходимые аргументы'}},
+            403: {'example': {'Status': False, 'Error': 'Не удалось авторизовать'}}
+        }
+    )
 
     # Авторизация методом POST
     def post(self, request, *args, **kwargs):
@@ -183,6 +235,29 @@ class ProductInfoView(APIView):
     """
 
     throttle_classes = (AnonRateThrottle,)
+    
+    @extend_schema(
+        responses={
+            200: {'example': {
+                "id": 4216292,
+                "model": "apple/iphone/xs-max",
+                "product": "Петров",
+                "shop": "petrov-s@gmail.com",
+                "quantity": 14,
+                "price": 110000,
+                "price_rrc": 116190,
+                "product_parameters": [
+                    {
+                        "Диагональ (дюйм)": 6.1,
+                        "Разрешение (пикс)": "1792x828",
+                        "Встроенная память (Гб)": 256,
+                        "Цвет": "черный"
+                    }      
+                ]
+            },
+        }
+        }
+    )
 
     def get(self, request, *args, **kwargs):
 
