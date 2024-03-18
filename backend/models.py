@@ -4,6 +4,8 @@ from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django_rest_passwordreset.tokens import get_token_generator
+from versatileimagefield.fields import VersatileImageField
+from versatileimagefield.placeholder import OnDiscPlaceholderImage
 
 STATE_CHOICES = (
     ('basket', 'Статус корзины'),
@@ -77,6 +79,7 @@ class User(AbstractUser):
             'unique': _("A user with that username already exists."),
         },
     )
+    avatar = VersatileImageField(upload_to='images/', blank=True, null=True)
     is_active = models.BooleanField(
         _('active'),
         default=False,
