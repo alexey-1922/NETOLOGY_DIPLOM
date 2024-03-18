@@ -28,7 +28,7 @@ class RegisterAccount(APIView):
     """
     Для регистрации покупателей
     """
-    @extend_schema(
+    @extend_schema(summary="Регистрация покупателей",
         request=UserSerializer,
         responses={
             201: {'example': {'Status': True, 'Comment': 'Пользователь зарегистрирован'}},
@@ -78,7 +78,7 @@ class ConfirmAccount(APIView):
 
     throttle_classes = (AnonRateThrottle,)
     
-    @extend_schema(
+    @extend_schema(summary="Подтверждение токена и email",
         request=UserSerializer,
         responses={
             200: {'example': {'Status': True, 'Comment': 'Токен правильный'}},
@@ -113,7 +113,7 @@ class AccountDetails(APIView):
 
     throttle_classes = (UserRateThrottle,)
     
-    @extend_schema(
+    @extend_schema(summary="Получение данных о пользователе",
         request=UserSerializer,
         responses={
             200: {'example': {
@@ -139,7 +139,7 @@ class AccountDetails(APIView):
         return Response(serializer.data)
 
 
-    @extend_schema(
+    @extend_schema(summary="Редактирование данных о пользователе",
         request=UserSerializer,
         responses={
             201: {'example': {'Status': True, 'Comment': 'Пользователь обновлен'}},
@@ -186,7 +186,7 @@ class LoginAccount(APIView):
 
     throttle_classes = (AnonRateThrottle,)
     
-    @extend_schema(
+    @extend_schema(summary="Авторизация пользователя",
         request=UserSerializer,
         responses={
             201: {'example': {'Status': True, 'Comment': 'Вы вошли в систему'}},
@@ -237,7 +237,7 @@ class ProductInfoView(APIView):
 
     throttle_classes = (AnonRateThrottle,)
     
-    @extend_schema(
+    @extend_schema(summary="Поиск товара",
         request=ProductInfoSerializer,
         responses={
             200: {'example': {
@@ -291,7 +291,7 @@ class BasketView(APIView):
 
     throttle_classes = (UserRateThrottle,)
     
-    @extend_schema(
+    @extend_schema(summary="Получение корзины пользователя",
         request=OrderSerializer,
         responses={
             200: {'example': 
@@ -338,11 +338,12 @@ class BasketView(APIView):
         return Response(serializer.data)
 
 
-    @extend_schema(
+    @extend_schema(summary="Редактирование корзины пользователя",
         request=OrderItemSerializer,
         responses={
             201: {'example': {'Status': True, 'Comment': "Объект создан"}},
             400: {'example': {'Status': False, 'Error': 'Не верный формат запроса'}},
+            403: {'example': {'Status': False, 'Error': 'Требуется вход в систему'}},
         }
     )
     # редактировать корзину
@@ -380,11 +381,12 @@ class BasketView(APIView):
         return JsonResponse({'Status': False, 'Errors': 'Не указаны все необходимые аргументы'},
                             status.HTTP_400_BAD_REQUEST)
 
-    @extend_schema(
+    @extend_schema(summary="Удаление товаров из корзины пользователя",
         request=OrderItemSerializer,
         responses={
             200: {'example': {'Status': True, 'Comment': "Объект удален"}},
             400: {'example': {'Status': False, 'Error': 'Не верный формат запроса'}},
+            403: {'example': {'Status': False, 'Error': 'Требуется вход в систему'}},
         }
     )
 
@@ -411,11 +413,12 @@ class BasketView(APIView):
         return JsonResponse({'Status': False, 'Errors': 'Не указаны все необходимые аргументы'},
                             status.HTTP_400_BAD_REQUEST)
 
-    @extend_schema(
+    @extend_schema(summary="Добавить позиции в корзину пользователя",
         request=OrderItemSerializer,
         responses={
             200: {'example': {'Status': True, 'Comment': "Объект обновлен"}},
             400: {'example': {'Status': False, 'Error': 'Не верный формат запроса'}},
+            403: {'example': {'Status': False, 'Error': 'Требуется вход в систему'}},
         }
     )
 
@@ -451,7 +454,7 @@ class PartnerUpdate(APIView):
 
     throttle_classes = (UserRateThrottle,)
     
-    @extend_schema(
+    @extend_schema(summary="Обновление прайса поставщика",
         responses={
             200: {'example': {'Status': True, 'Comment': 'Прайс обновлен'}},
             403: {'example': {'Status': False, 'Error': 'Только для магазинов'}},
@@ -489,7 +492,7 @@ class PartnerState(APIView):
 
     throttle_classes = (UserRateThrottle,)
 
-    @extend_schema(
+    @extend_schema(summary="Получить статус поставщика",
         request=ShopSerializer,
         responses={
             200: {'example': 
@@ -518,8 +521,8 @@ class PartnerState(APIView):
         shop = request.user.shop
         serializer = ShopSerializer(shop)
         return Response(serializer.data)
-
-    @extend_schema(
+    
+    @extend_schema(summary="Изменить статус поставщика",
         responses={
             200: {'example': {'Status': True, 'Comment': 'Текущий статус изменен'}},
             403: {'example': {'Status': False, 'Error': 'Только для магазинов'}},
@@ -556,7 +559,7 @@ class PartnerOrders(APIView):
 
     throttle_classes = (UserRateThrottle,)
     
-    @extend_schema(
+    @extend_schema(summary="Получить заказ поставщика",
         request=OrderSerializer,
         responses={
             200: {'example': 
@@ -615,7 +618,7 @@ class ContactView(APIView):
 
     throttle_classes = (UserRateThrottle,)
     
-    @extend_schema(
+    @extend_schema(summary="Получить свои контакты",
         request=ContactSerializer,
         responses={
             200: {'example': {
@@ -646,7 +649,7 @@ class ContactView(APIView):
         serializer = ContactSerializer(contact, many=True)
         return Response(serializer.data)
 
-    @extend_schema(
+    @extend_schema(summary="Добавить новый контакт",
         request=ContactSerializer,
         responses={
             201: {'example': {'Status': True, 'Comment': "Контак создан"}},
@@ -677,7 +680,7 @@ class ContactView(APIView):
         return JsonResponse({'Status': False, 'Errors': 'Не указаны все необходимые аргументы'},
                             status=status.HTTP_401_UNAUTHORIZED)
 
-    @extend_schema(
+    @extend_schema(summary="Удалить контакт",
         request=ContactSerializer,
         responses={
             200: {'example': {'Status': True, 'Comment': "Объект удален"}},
@@ -709,7 +712,7 @@ class ContactView(APIView):
         return JsonResponse({'Status': False, 'Errors': 'Не указаны все необходимые аргументы'},
                             status=status.HTTP_400_BAD_REQUEST)
 
-    @extend_schema(
+    @extend_schema(summary="Редактировать контакт",
         request=ContactSerializer,
         responses={
             200: {'example': {'Status': True, 'Comment': "Объект обновлен"}},
@@ -748,7 +751,7 @@ class OrderView(APIView):
 
     throttle_classes = (UserRateThrottle,)
 
-    @extend_schema(
+    @extend_schema(summary="Получить мои заказы",
         request=OrderSerializer,
         responses={
             200: {'example': 
@@ -792,7 +795,7 @@ class OrderView(APIView):
         serializer = OrderSerializer(order, many=True)
         return Response(serializer.data)
 
-    @extend_schema(
+    @extend_schema(summary="Разместить заказ из корзины",
         request=OrderSerializer,
         responses={
             200: {'example': {'Status': True, 'Comment': "Заказ размещен"}},
