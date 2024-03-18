@@ -11,6 +11,26 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 import os
 from pathlib import Path
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+from dotenv import load_dotenv
+
+
+load_dotenv()
+
+s_dsn = os.environ["SENTRY_DSN"]
+
+sentry_sdk.init(
+    dsn=s_dsn,
+    integrations=[DjangoIntegration(
+        transaction_style='url',
+        middleware_spans=True,
+        signals_spans=False,
+        cache_spans=False,
+    )],
+    enable_tracing=True,
+)
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent

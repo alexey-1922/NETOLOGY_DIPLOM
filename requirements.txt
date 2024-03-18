@@ -19,3 +19,5 @@ pytest-django
 django-versatileimagefield
 django-jet-reboot
 sentry-sdk
+load-dotenv
+python-dotenv
