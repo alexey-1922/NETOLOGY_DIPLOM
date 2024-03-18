@@ -18,7 +18,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-s_dsn = os.environ["SENTRY_DSN"]
+#s_dsn = os.environ["SENTRY_DSN"]
+s_dsn = 'https://12927b5f211046b575ee51fd8b1ac34f@o1.ingest.sentry.io/1'
 
 sentry_sdk.init(
     dsn=s_dsn,

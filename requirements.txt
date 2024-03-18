@@ -21,3 +21,4 @@ django-jet-reboot
 sentry-sdk
 load-dotenv
 python-dotenv
+python-magic-bin
