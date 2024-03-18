@@ -79,7 +79,7 @@ class ConfirmAccount(APIView):
     throttle_classes = (AnonRateThrottle,)
     
     @extend_schema(
-        request=UserSerializer
+        request=UserSerializer,
         responses={
             200: {'example': {'Status': True, 'Comment': 'Токен правильный'}},
             401: {'example': {'Status': False, 'Errors': 'Неправильно указан токен или email'}},
