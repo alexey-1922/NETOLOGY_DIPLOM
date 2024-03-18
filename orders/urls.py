@@ -20,6 +20,8 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, Spec
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('jet/', include('jet.urls', namespace='jet')), 
+    path('jet/dashboard/', include('jet.dashboard.urls', namespace='jet-dashboard')),
     path('api/v1/', include('backend.urls', namespace='backend')),
     path('accounts/', include('allauth.urls')),
     path('', Home.as_view(), name='home'),
