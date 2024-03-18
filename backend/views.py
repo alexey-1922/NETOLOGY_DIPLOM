@@ -114,6 +114,7 @@ class AccountDetails(APIView):
     throttle_classes = (UserRateThrottle,)
     
     @extend_schema(
+        request=UserSerializer,
         responses={
             200: {'example': {
                 "id": 1,
@@ -237,6 +238,7 @@ class ProductInfoView(APIView):
     throttle_classes = (AnonRateThrottle,)
     
     @extend_schema(
+        request=ProductInfoSerializer,
         responses={
             200: {'example': {
                 "id": 4216292,
@@ -288,6 +290,38 @@ class BasketView(APIView):
     """
 
     throttle_classes = (UserRateThrottle,)
+    
+    @extend_schema(
+        request=OrderSerializer,
+        responses={
+            200: {'example': 
+                {
+                "id": 1,
+                "ordered_items": [
+                    {
+                        "order":1,
+                        "product_info": [
+                            {
+                                "name": "Смартфон Apple iPhone XS Max 512GB (золотистый)",
+                                "model": "apple/iphone/xs-max",
+                                "external_id": 1,
+                                "product": "phone",
+                                "shop": "Связной",
+                                "quantity": 1,
+                                "price": 110000,
+                                "price_rcc": 116990
+                                }],
+                        "shop": "Связной",
+                        "quantity": "1"}],
+                        "state": "basket",
+                        "dt": "11.03.2023",
+                        "total_sum": 1,
+                        "contact": "Петров Сергей"
+                },
+        },
+        403: {'example': {'Status': False, 'Comment': 'Error', 'Error': 'Требуется вход в систему'}},
+        }
+    )
 
     # получить корзину
     def get(self, request, *args, **kwargs):
@@ -303,6 +337,14 @@ class BasketView(APIView):
         serializer = OrderSerializer(basket, many=True)
         return Response(serializer.data)
 
+
+    @extend_schema(
+        request=OrderItemSerializer,
+        responses={
+            201: {'example': {'Status': True, 'Comment': "Объект создан"}},
+            400: {'example': {'Status': False, 'Error': 'Не верный формат запроса'}},
+        }
+    )
     # редактировать корзину
     def post(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
@@ -338,6 +380,14 @@ class BasketView(APIView):
         return JsonResponse({'Status': False, 'Errors': 'Не указаны все необходимые аргументы'},
                             status.HTTP_400_BAD_REQUEST)
 
+    @extend_schema(
+        request=OrderItemSerializer,
+        responses={
+            200: {'example': {'Status': True, 'Comment': "Объект удален"}},
+            400: {'example': {'Status': False, 'Error': 'Не верный формат запроса'}},
+        }
+    )
+
     # удалить товары из корзины
     def delete(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
@@ -360,6 +410,14 @@ class BasketView(APIView):
                                     status=status.HTTP_200_OK)
         return JsonResponse({'Status': False, 'Errors': 'Не указаны все необходимые аргументы'},
                             status.HTTP_400_BAD_REQUEST)
+
+    @extend_schema(
+        request=OrderItemSerializer,
+        responses={
+            200: {'example': {'Status': True, 'Comment': "Объект обновлен"}},
+            400: {'example': {'Status': False, 'Error': 'Не верный формат запроса'}},
+        }
+    )
 
     # добавить позиции в корзину
     def put(self, request, *args, **kwargs):
@@ -392,6 +450,14 @@ class PartnerUpdate(APIView):
     """
 
     throttle_classes = (UserRateThrottle,)
+    
+    @extend_schema(
+        responses={
+            200: {'example': {'Status': True, 'Comment': 'Прайс обновлен'}},
+            403: {'example': {'Status': False, 'Error': 'Только для магазинов'}},
+            400: {'example': {'Status': False, 'Error': 'Не верный формат запроса'}}
+        }
+    )
 
     def post(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
@@ -423,6 +489,22 @@ class PartnerState(APIView):
 
     throttle_classes = (UserRateThrottle,)
 
+    @extend_schema(
+        request=ShopSerializer,
+        responses={
+            200: {'example': 
+                {
+                "id": 1,
+                "name": "Связной",
+                "state": True,
+                },
+        },
+        403: {'example': {'Status': False, 'Comment': 'Error', 'Error': 'Требуется вход в систему'}},
+        403: {'example': {'Status': False, 'Comment': 'Error', 'Error': 'Только для магазинов'}},
+        }
+    )
+
+
     # получить текущий статус
     def get(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
@@ -436,6 +518,15 @@ class PartnerState(APIView):
         shop = request.user.shop
         serializer = ShopSerializer(shop)
         return Response(serializer.data)
+
+    @extend_schema(
+        responses={
+            200: {'example': {'Status': True, 'Comment': 'Текущий статус изменен'}},
+            403: {'example': {'Status': False, 'Error': 'Только для магазинов'}},
+            403: {'example': {'Status': False, 'Error': 'Требуется вход в систему'}},
+            400: {'example': {'Status': False, 'Error': 'Не верный формат запроса'}}
+        }
+    )
 
     # изменить текущий статус
     def post(self, request, *args, **kwargs):
@@ -464,6 +555,39 @@ class PartnerOrders(APIView):
     """
 
     throttle_classes = (UserRateThrottle,)
+    
+    @extend_schema(
+        request=OrderSerializer,
+        responses={
+            200: {'example': 
+                {
+                "id": 1,
+                "ordered_items": [
+                    {
+                        "order":1,
+                        "product_info": [
+                            {
+                                "name": "Смартфон Apple iPhone XS Max 512GB (золотистый)",
+                                "model": "apple/iphone/xs-max",
+                                "external_id": 1,
+                                "product": "phone",
+                                "shop": "Связной",
+                                "quantity": 1,
+                                "price": 110000,
+                                "price_rcc": 116990
+                                }],
+                        "shop": "Связной",
+                        "quantity": "1"}],
+                        "dt": "11.03.2023",
+                        "total_sum": 1,
+                },
+        },
+        403: {'example': {'Status': False, 'Comment': 'Error', 'Error': 'Требуется вход в систему'}},
+        403: {'example': {'Status': False, 'Comment': 'Error', 'Error': 'Только для маазинов'}},
+        }
+    )
+    
+
 
     def get(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
@@ -490,6 +614,27 @@ class ContactView(APIView):
     """
 
     throttle_classes = (UserRateThrottle,)
+    
+    @extend_schema(
+        request=ContactSerializer,
+        responses={
+            200: {'example': {
+                "id": 1,
+                "country": "РФ",
+                "zip": 197228,
+                "city": "Санкт-Петербург",
+                "street": "Ивинская",
+                "house": 13,
+                "structure": "+79998887777",
+                "building": "",
+                "apartment": "",
+                "user": "admin",
+                "phone": "+79998887777"     
+            }
+            },
+            403: {'example': {'Status': False, 'Comment': 'Error', 'Error': 'Требуется вход в систему'}},
+        }
+    ) 
 
     # получить мои контакты
     def get(self, request, *args, **kwargs):
@@ -500,6 +645,16 @@ class ContactView(APIView):
             user_id=request.user.id)
         serializer = ContactSerializer(contact, many=True)
         return Response(serializer.data)
+
+    @extend_schema(
+        request=ContactSerializer,
+        responses={
+            201: {'example': {'Status': True, 'Comment': "Контак создан"}},
+            400: {'example': {'Status': False, 'Error': 'Не верный формат запроса'}},
+            401: {'example': {'Status': False, 'Error': 'Не указаны все необходимые аргументы'}},
+            403: {'example': {'Status': False, 'Error': 'Требуется вход в систему'}},
+        }
+    )
 
     # добавить новый контакт
     def post(self, request, *args, **kwargs):
@@ -521,6 +676,15 @@ class ContactView(APIView):
 
         return JsonResponse({'Status': False, 'Errors': 'Не указаны все необходимые аргументы'},
                             status=status.HTTP_401_UNAUTHORIZED)
+
+    @extend_schema(
+        request=ContactSerializer,
+        responses={
+            200: {'example': {'Status': True, 'Comment': "Объект удален"}},
+            400: {'example': {'Status': False, 'Error': 'Не указаны все необходимые аргументы'}},
+            403: {'example': {'Status': False, 'Error': 'Требуется вход в систему'}},
+        }
+    )
 
     # удалить контакт
     def delete(self, request, *args, **kwargs):
@@ -544,6 +708,15 @@ class ContactView(APIView):
                                     status=status.HTTP_200_OK)
         return JsonResponse({'Status': False, 'Errors': 'Не указаны все необходимые аргументы'},
                             status=status.HTTP_400_BAD_REQUEST)
+
+    @extend_schema(
+        request=ContactSerializer,
+        responses={
+            200: {'example': {'Status': True, 'Comment': "Объект обновлен"}},
+            400: {'example': {'Status': False, 'Error': 'Не указаны все необходимые аргументы'}},
+            403: {'example': {'Status': False, 'Error': 'Требуется вход в систему'}},
+        }
+    )
 
     # редактировать контакт
     def put(self, request, *args, **kwargs):
@@ -575,6 +748,36 @@ class OrderView(APIView):
 
     throttle_classes = (UserRateThrottle,)
 
+    @extend_schema(
+        request=OrderSerializer,
+        responses={
+            200: {'example': 
+                {
+                "id": 1,
+                "ordered_items": [
+                    {
+                        "order":1,
+                        "product_info": [
+                            {
+                                "name": "Смартфон Apple iPhone XS Max 512GB (золотистый)",
+                                "model": "apple/iphone/xs-max",
+                                "external_id": 1,
+                                "product": "phone",
+                                "shop": "Связной",
+                                "quantity": 1,
+                                "price": 110000,
+                                "price_rcc": 116990
+                                }],
+                        "shop": "Связной",
+                        "quantity": "1"}],
+                        "dt": "11.03.2023",
+                        "total_sum": 1,
+                },
+        },
+        403: {'example': {'Status': False, 'Comment': 'Error', 'Error': 'Требуется вход в систему'}},
+        }
+    )
+
     # получить мои заказы
     def get(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
@@ -588,6 +791,15 @@ class OrderView(APIView):
 
         serializer = OrderSerializer(order, many=True)
         return Response(serializer.data)
+
+    @extend_schema(
+        request=OrderSerializer,
+        responses={
+            200: {'example': {'Status': True, 'Comment': "Заказ размещен"}},
+            400: {'example': {'Status': False, 'Error': 'Не указаны все необходимые аргументы'}},
+            403: {'example': {'Status': False, 'Error': 'Требуется вход в систему'}},
+        }
+    )
 
     # разместить заказ из корзины
     def post(self, request, *args, **kwargs):
