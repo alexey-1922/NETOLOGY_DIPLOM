@@ -5,9 +5,13 @@ from backend.views import PartnerUpdate, RegisterAccount, LoginAccount, Category
     BasketView, \
     AccountDetails, ContactView, OrderView, PartnerState, PartnerOrders, ConfirmAccount
     
+def trigger_error(request):
+     division_by_zero = 1 / 0  # sentry trigger
 
 app_name = 'backend'
 urlpatterns = [
+    path('sentry-debug/', trigger_error),
+    
     path('partner/update', PartnerUpdate.as_view(), name='partner-update'),
     path('partner/state', PartnerState.as_view(), name='partner-state'),
     path('partner/orders', PartnerOrders.as_view(), name='partner-orders'),

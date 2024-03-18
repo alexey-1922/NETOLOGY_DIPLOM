@@ -18,3 +18,4 @@ drf-spectacular-sidecar
 pytest-django
 django-versatileimagefield
 django-jet-reboot
+sentry-sdk
